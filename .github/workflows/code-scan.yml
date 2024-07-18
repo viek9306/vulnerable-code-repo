@@ -1,0 +1,76 @@
+name: Code Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [python, go]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Bandit
+        if: matrix.language == 'python'
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit
+
+      - name: Run Bandit
+        if: matrix.language == 'python'
+        id: bandit
+        run: bandit -r . || echo 'Bandit scan completed'
+
+      - name: Set up Go
+        if: matrix.language == 'go'
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+
+      - name: Install gosec
+        if: matrix.language == 'go'
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Run gosec
+        if: matrix.language == 'go'
+        id: gosec
+        run: gosec ./... || echo 'gosec scan completed'
+
+      - name: Determine result
+        id: result
+        run: |
+          if [[ "${{ matrix.language }}" == 'python' ]]; then
+            if grep -q 'CRITICAL' <(bandit -r .); then
+              echo "result=block" >> $GITHUB_ENV
+            else
+              echo "result=success" >> $GITHUB_ENV
+            fi
+          elif [[ "${{ matrix.language }}" == 'go' ]]; then
+            if grep -q 'CRITICAL' <(gosec ./...); then
+              echo "result=block" >> $GITHUB_ENV
+            else
+              echo "result=success" >> $GITHUB_ENV
+            fi
+          fi
+
+      - name: Comment on the pull request
+        run: |
+          if [[ "${{ env.result }}" == 'block' ]]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body 'Block'
+            exit 1
+          else
+            gh pr comment ${{ github.event.pull_request.number }} --body 'Successful'
+            gh pr merge ${{ github.event.pull_request.number }} --merge
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
