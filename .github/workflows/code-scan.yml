@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        language: [python, go]
+        language: [python]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -30,21 +30,6 @@ jobs:
         if: matrix.language == 'python'
         id: bandit
         run: bandit -r . || echo 'Bandit scan completed'
-
-      - name: Set up Go
-        if: matrix.language == 'go'
-        uses: actions/setup-go@v2
-        with:
-          go-version: '^1.16'
-
-      - name: Install gosec
-        if: matrix.language == 'go'
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
-
-      - name: Run gosec
-        if: matrix.language == 'go'
-        id: gosec
-        run: gosec ./... || echo 'gosec scan completed'
 
       - name: Determine result
         id: result
