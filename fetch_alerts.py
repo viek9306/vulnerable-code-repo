@@ -1,13 +1,13 @@
 import requests
 import os
 
-GITHUB_TOKEN = os.getenv('HUB_TOKEN')
-REPO_OWNER = 'viek9306'  # Replace with your GitHub username
-REPO_NAME = 'vulnerable-code-repo'  # Replace with your repository name
+GITHUB_TOKEN = os.getenv('HUB_TOKEN')  # Update to use HUB_TOKEN
+REPO_OWNER = 'viek9306'  # Your GitHub username
+REPO_NAME = 'vulnerable-code-repo'  # Your repository name
 SEVERITY = 'high'
 
 if not GITHUB_TOKEN:
-    raise ValueError("GITHUB_TOKEN environment variable is not set")
+    raise ValueError("HUB_TOKEN environment variable is not set")
 
 headers = {
     'Authorization': f'token {GITHUB_TOKEN}',
