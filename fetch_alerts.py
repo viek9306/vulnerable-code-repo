@@ -1,7 +1,7 @@
 import requests
 import os
 
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+GITHUB_TOKEN = os.getenv('HUB_TOKEN')
 REPO_OWNER = 'viek9306'  # Replace with your GitHub username
 REPO_NAME = 'vulnerable-code-repo'  # Replace with your repository name
 SEVERITY = 'high'
