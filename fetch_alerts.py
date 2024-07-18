@@ -1,5 +1,6 @@
 import requests
 import os
+import json
 
 GITHUB_TOKEN = os.getenv('HUB_TOKEN')  # Ensure to use HUB_TOKEN
 REPO_OWNER = 'viek9306'  # Your GitHub username
@@ -32,7 +33,10 @@ except ValueError as e:
     print(response.text)
     raise
 
-# Debug output to check the structure of the response
+# Save alerts to a file
+with open('alerts.json', 'w') as f:
+    json.dump(alerts, f, indent=2)
+
 print("Fetched alerts:", alerts)
 
 # Filter high severity alerts
@@ -47,7 +51,9 @@ cwe_data = {
 
 print("Vulnerabilities with severity High and 'Likelihood of exploitability' High:")
 for alert in high_alerts:
-    cwe_id = alert['rule']['tags'][0]  # Example way to get CWE ID
+    cwe_id = alert['rule']['tags'][0]
     likelihood = cwe_data.get(cwe_id, 'Unknown')
+    if likelihood is None:
+        likelihood = "Unknown"
     if likelihood == 'High':
         print(f"- {alert['rule']['description']} (CWE ID: {cwe_id}, Likelihood: {likelihood})")
