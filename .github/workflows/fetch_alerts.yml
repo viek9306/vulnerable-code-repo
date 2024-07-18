@@ -25,5 +25,5 @@ jobs:
 
       - name: Run fetch_alerts.py
         env:
-          GITHUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}  # Ensure this is the correct secret name
         run: python fetch_alerts.py
