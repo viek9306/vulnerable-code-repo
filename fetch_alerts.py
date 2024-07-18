@@ -7,7 +7,7 @@ REPO_NAME = 'vulnerable-code-repo'  # Replace with your repository name
 SEVERITY = 'high'
 
 if not GITHUB_TOKEN:
-    raise ValueError("GITHUB_TOKEN environment variable is not set")
+    raise ValueError("HUB_TOKEN environment variable is not set")
 
 headers = {
     'Authorization': f'token {GITHUB_TOKEN}',
